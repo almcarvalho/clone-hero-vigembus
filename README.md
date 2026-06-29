@@ -18,7 +18,7 @@ Projeto simples para usar guitarra ou bateria feita com ESP32 no Clone Hero. O E
 No terminal, dentro desta pasta:
 
 ```bash
-pip install pynput
+ pip install vgamepad
 ```
 
 ## Configurar o ESP32
