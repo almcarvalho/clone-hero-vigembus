@@ -102,3 +102,9 @@ Configure essas mesmas teclas dentro do Clone Hero.
 - Libere o Python no Firewall do Windows.
 - Confira se a porta e a mesma nos dois codigos: `4210`.
 - Rode o `hero.py` antes de apertar os botoes.
+
+Lista de peças:
+
+Em breve...
+
+Compre na robocore.net use o cupom: LCSISTEMAS
