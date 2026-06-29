@@ -3,15 +3,15 @@
 Projeto simples para usar guitarra ou bateria feita com ESP32 no Clone Hero. O ESP32 le os botoes e envia comandos por UDP para este script Python, que aperta teclas no Windows.
 
 ## O que precisa
-
-- ESP32
+- Emulador de controle vigembus instalado no windows e dps reiniciar o pc (https://vigembus.com/ )
+- ESP32 
 - Arduino IDE
 - Bibliotecas Arduino:
   - `WiFiManager`
   - `WiFi`
   - `WiFiUdp`
 - Python 3.11 instalado no PC
-- Clone Hero instalado
+- Clone Hero instalado (Jogo)
 
 ## Instalar dependencias do Python
 
