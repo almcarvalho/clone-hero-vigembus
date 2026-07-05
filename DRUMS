@@ -31,6 +31,9 @@ bool lastOrange = HIGH;
 bool lastKick = HIGH;
 bool lastStart = HIGH;
 
+const unsigned long TEMPO_DEBOUNCE = 25;
+const unsigned long TEMPO_REPETICAO = 80;
+
 void configModeCallback(WiFiManager*) {
   portalAberto = true;
 }
@@ -50,44 +53,53 @@ void controlarLed() {
   if (WiFi.status() == WL_CONNECTED) {
     portalAberto = false;
     digitalWrite(LED_AZUL, HIGH);
-  } 
+  }
   else if (portalAberto) {
     if (millis() - t > 300) {
       t = millis();
       e = !e;
       digitalWrite(LED_AZUL, e);
     }
-  } 
+  }
   else {
     digitalWrite(LED_AZUL, LOW);
   }
 }
 
-void verificarBotao(int pino, bool &ultimoEstado, const char* nome, bool pulsoRapido) {
-  bool estadoAtual = digitalRead(pino);
+void verificarBotao(int pino, bool &ultimoEstado, const char* nome, bool pulsoRapido)
+{
+    static unsigned long ultimoTempoMudanca[40] = {0};
+    static unsigned long ultimoDisparo[40] = {0};
 
-  if (estadoAtual != ultimoEstado) {
-    delay(5); // debounce simples
-    estadoAtual = digitalRead(pino);
+    bool leitura = digitalRead(pino);
 
-    if (estadoAtual != ultimoEstado) {
-      ultimoEstado = estadoAtual;
+    if (leitura != ultimoEstado) {
 
-      if (estadoAtual == LOW) {
-        enviar(nome, "DOWN");
+        if (millis() - ultimoTempoMudanca[pino] < TEMPO_DEBOUNCE)
+            return;
 
-        if (pulsoRapido) {
-          delay(5);
-          enviar(nome, "UP");
+        ultimoTempoMudanca[pino] = millis();
+        ultimoEstado = leitura;
+
+        if (leitura == LOW) {
+
+            if (millis() - ultimoDisparo[pino] < TEMPO_REPETICAO)
+                return;
+
+            ultimoDisparo[pino] = millis();
+
+            enviar(nome, "DOWN");
+
+            if (pulsoRapido)
+                enviar(nome, "UP");
+
+        } else {
+
+            if (!pulsoRapido)
+                enviar(nome, "UP");
+
         }
-      } 
-      else {
-        if (!pulsoRapido) {
-          enviar(nome, "UP");
-        }
-      }
     }
-  }
 }
 
 void setup() {
