@@ -1,77 +1,71 @@
 /*
-====================================================
-BATERIA COM 5 PIEZOS + 2 BOTÕES - ARDUINO UNO
+  DRUMS - Arduino Uno
+  Envia apenas eventos DOWN pela Serial
 
-CAPTA O SINAL DOS PIEZOS DE ACORDO COM A VARIAÇÃO DELE (DELTA)
+  Ligações:
+  Botão -> Pino digital
+  Outro terminal -> GND
 
-Envia pela Serial:
-R,Y,B,G,O,K,S
-====================================================
+  Serial: 115200
 */
 
-const int PIEZO_RED    = A0;
-const int PIEZO_YELLOW = A1;
-const int PIEZO_BLUE   = A2;
-const int PIEZO_GREEN  = A3;
-const int PIEZO_ORANGE = A4;
+const byte BTN_RED    = 2;
+const byte BTN_YELLOW = 3;
+const byte BTN_BLUE   = 4;
+const byte BTN_GREEN  = 5;
+const byte BTN_ORANGE = 6;
+const byte BTN_KICK   = 7;
+const byte BTN_START  = 8;
 
-const int BTN_KICK = 8;
-const int BTN_START = 9;
+const unsigned long DEBOUNCE = 20;
 
-const int BUZZER = 2;
+struct Botao {
+  byte pino;
+  const char* nome;
+  bool ultimoEstado;
+  unsigned long ultimoTempo;
+};
 
-const int DELTA_MINIMO = 20;
-const unsigned long TEMPO_RETRIGGER = 300;
+Botao botoes[] = {
+  {BTN_RED,    "DRUM_RED:DOWN",    HIGH, 0},
+  {BTN_YELLOW, "DRUM_YELLOW:DOWN", HIGH, 0},
+  {BTN_BLUE,   "DRUM_BLUE:DOWN",   HIGH, 0},
+  {BTN_GREEN,  "DRUM_GREEN:DOWN",  HIGH, 0},
+  {BTN_ORANGE, "DRUM_ORANGE:DOWN", HIGH, 0},
+  {BTN_KICK,   "KICK:DOWN",        HIGH, 0},
+  {BTN_START,  "START:DOWN",       HIGH, 0}
+};
 
-const int SOM_RED=200,SOM_YELLOW=400,SOM_BLUE=700,SOM_GREEN=900,SOM_ORANGE=1100;
+const byte TOTAL_BOTOES = sizeof(botoes) / sizeof(botoes[0]);
 
-int ultimoRed=0,ultimoYellow=0,ultimoBlue=0,ultimoGreen=0,ultimoOrange=0;
-unsigned long ultimoHitRed=0,ultimoHitYellow=0,ultimoHitBlue=0,ultimoHitGreen=0,ultimoHitOrange=0;
-
-bool ultimoKick,HultimoStart;
-
-void setup(){
+void setup() {
   Serial.begin(115200);
-  pinMode(BUZZER,OUTPUT);
-  pinMode(BTN_KICK,INPUT_PULLUP);
-  pinMode(BTN_START,INPUT_PULLUP);
-  ultimoKick=digitalRead(BTN_KICK);
-  HultimoStart=digitalRead(BTN_START);
+
+  for (byte i = 0; i < TOTAL_BOTOES; i++) {
+    pinMode(botoes[i].pino, INPUT_PULLUP);
+    botoes[i].ultimoEstado = digitalRead(botoes[i].pino);
+  }
 }
 
-void loop(){
-  int red=analogRead(PIEZO_RED);
-  int yellow=analogRead(PIEZO_YELLOW);
-  int blue=analogRead(PIEZO_BLUE);
-  int green=analogRead(PIEZO_GREEN);
-  int orange=analogRead(PIEZO_ORANGE);
+void loop() {
 
-  int dR=red-ultimoRed,dY=yellow-ultimoYellow,dB=blue-ultimoBlue,dG=green-ultimoGreen,dO=orange-ultimoOrange;
+  unsigned long agora = millis();
 
-  Serial.print("R:");Serial.print(dR);
-  Serial.print("\tY:");Serial.print(dY);
-  Serial.print("\tB:");Serial.print(dB);
-  Serial.print("\tG:");Serial.print(dG);
-  Serial.print("\tO:");Serial.println(dO);
+  for (byte i = 0; i < TOTAL_BOTOES; i++) {
 
-  if(dR>DELTA_MINIMO && millis()-ultimoHitRed>TEMPO_RETRIGGER){ultimoHitRed=millis();tone(BUZZER,SOM_RED,30);Serial.println("R");}
-  if(dY>DELTA_MINIMO && millis()-ultimoHitYellow>TEMPO_RETRIGGER){ultimoHitYellow=millis();tone(BUZZER,SOM_YELLOW,30);Serial.println("Y");}
-  if(dB>DELTA_MINIMO && millis()-ultimoHitBlue>TEMPO_RETRIGGER){ultimoHitBlue=millis();tone(BUZZER,SOM_BLUE,30);Serial.println("B");}
-  if(dG>DELTA_MINIMO && millis()-ultimoHitGreen>TEMPO_RETRIGGER){ultimoHitGreen=millis();tone(BUZZER,SOM_GREEN,30);Serial.println("G");}
-  if(dO>DELTA_MINIMO && millis()-ultimoHitOrange>TEMPO_RETRIGGER){ultimoHitOrange=millis();tone(BUZZER,SOM_ORANGE,30);Serial.println("O");}
+    bool leitura = digitalRead(botoes[i].pino);
 
-  bool k=digitalRead(BTN_KICK);
-  if(k!=ultimoKick){
-    ultimoKick=k;
-    Serial.println(k==LOW?"K_DOWN":"K_UP");
+    if (leitura != botoes[i].ultimoEstado) {
+
+      if (agora - botoes[i].ultimoTempo < DEBOUNCE)
+        continue;
+
+      botoes[i].ultimoTempo = agora;
+      botoes[i].ultimoEstado = leitura;
+
+      if (leitura == LOW) {
+        Serial.println(botoes[i].nome);
+      }
+    }
   }
-
-  bool s=digitalRead(BTN_START);
-  if(s!=HultimoStart){
-    HultimoStart=s;
-    Serial.println(s==LOW?"S_DOWN":"S_UP");
-  }
-
-  ultimoRed=red; ultimoYellow=yellow; ultimoBlue=blue; ultimoGreen=green; ultimoOrange=orange;
-  delay(2);
 }
