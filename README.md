@@ -3,7 +3,7 @@
 <img width="640" height="360" alt="image" src="https://github.com/user-attachments/assets/b966f8a4-64e7-45b3-b93b-039ac5113ecb" />
 
 
-Projeto simples para usar guitarra ou bateria feita com ESP32/ARDUINO no jogo Clone Hero. 
+Projeto simples para usar os instrumentos musicais feitos com arduino no jogo similar a Guitar Hero e Rockband pra PC: O Clone Hero. 
 
 https://clonehero.net/
 
