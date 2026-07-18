@@ -9,6 +9,9 @@
 // Recebe 1 byte via ESP-NOW
 // Repassa o byte para a Serial
 // Pisca LED ao receber
+//Quando ele starta a primeira vez copie o mac exibido
+//vc precisará colocar esse mac tanto na guitarra, como 
+//no baixo
 //====================================================
 
 const byte LED_AZUL = 2;
