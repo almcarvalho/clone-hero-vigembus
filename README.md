@@ -7,11 +7,15 @@ Projeto simples para usar os instrumentos musicais feitos com arduino no jogo si
 
 https://clonehero.net/
 
-Inicialmente usamos a abordagem de conectar os instrumentos no ESP32 e mandar pela wifi usando udp,
-Depois, percebemos que os delays estavam bem ruins e atrapalhando bastante,
-passamos a usar uma placa arduino lendo botões, push buttons do grande, e escrevendo na serial
+Bateria: Arduino lendo botões, push buttons do grande, e escrevendo na serial,
 o programa em python monitora a porta serial e clica nos botões do controle virtual usando a
-lib vigebus
+lib vigebus.
+
+O baixo e a guitarra são um esp32 em cada um. 
+Fica um esp32 no pc receptor dos dois usando o protocolo espNow.
+
+Você precisa rodar o receptor primeiro pra pegar o mac dele, depois vai usar o mac 
+tanto na guitarra como no baixo.
 
 ## O que precisa
 - Emulador de controle vigembus instalado no windows e dps reiniciar o pc (https://vigembus.com/ )
